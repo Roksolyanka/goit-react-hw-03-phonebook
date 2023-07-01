@@ -16,9 +16,22 @@ export class ContactForm extends Component {
 
   submitForm = event => {
     event.preventDefault();
-    this.props.onSubmit(this.state.name, this.state.number);
+    const { name, number } = this.state;
+
+    this.props.onSubmit(name, number);
     this.setState({ name: '', number: '' });
   };
+
+  componentDidMount() {
+    const savedStringifiedContacts = localStorage.getItem('contacts');
+    const contacts = JSON.parse(savedStringifiedContacts) ?? [];
+    this.setState({ contacts });
+  }
+
+  componentWillUnmount() {
+    const savedStringifiedContacts = JSON.stringify(this.state.contacts);
+    localStorage.setItem('contacts', savedStringifiedContacts);
+  }
 
   render() {
     return (
@@ -28,7 +41,7 @@ export class ContactForm extends Component {
           type="text"
           id="name"
           name="name"
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+          pattern="^[a-zA-Zа-яА-Я]+([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
           value={this.state.name}
@@ -55,6 +68,4 @@ export class ContactForm extends Component {
 
 ContactForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
 };

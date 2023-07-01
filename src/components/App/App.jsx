@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
-import { ContactForm } from '../ContactForm/ContactForm';
-import { ContactList } from '../ContactList/ContactList';
-import { Filter } from '../Filter/Filter';
+import { ContactForm } from 'components/ContactForm/ContactForm';
+import { ContactList } from 'components/ContactList/ContactList';
+import { Filter } from 'components/Filter/Filter';
 import { TitlePhonebook } from './TitlePhonebook.styled';
 import { TitleContacts } from './TitleContacts.styled';
 
@@ -61,6 +60,19 @@ export class App extends Component {
     );
   };
 
+  componentDidMount() {
+    const savedStringifiedContacts = localStorage.getItem('contacts');
+    const contacts = JSON.parse(savedStringifiedContacts) ?? [];
+    this.setState({ contacts });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts.length !== this.state.contacts.length) {
+      const savedStringifiedContacts = JSON.stringify(this.state.contacts);
+      localStorage.setItem('contacts', savedStringifiedContacts);
+    }
+  }
+
   render() {
     const { filter } = this.state;
     const filteredContacts = this.findContacts();
@@ -79,19 +91,3 @@ export class App extends Component {
     );
   }
 }
-
-App.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ),
-  filter: PropTypes.string.isRequired,
-  addContact: PropTypes.func.isRequired,
-  deleteContact: PropTypes.func.isRequired,
-  changeFilter: PropTypes.func.isRequired,
-  findContacts: PropTypes.func.isRequired,
-  duplicationContacts: PropTypes.func.isRequired,
-};
